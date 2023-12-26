@@ -1,0 +1,92 @@
+#include <Servo.h>
+
+Servo myServo;
+
+// Definição dos pinos dos LEDs
+const int redLED1 = 2;
+const int redLED2 = 3;
+const int redLED3 = 4;
+const int yellowLED1 = 5;
+const int yellowLED2 = 6;
+const int greenLED = 7;
+
+const int buttonPin = 8;
+const int otherButtonPin = 10;
+const int servoPin = 9;
+
+int buttonState = 0;
+bool raceStarted = false;
+
+void setup() {
+  // Inicialização dos pinos dos LEDs
+  pinMode(redLED1, OUTPUT);
+  pinMode(redLED2, OUTPUT);
+  pinMode(redLED3, OUTPUT);
+  pinMode(yellowLED1, OUTPUT);
+  pinMode(yellowLED2, OUTPUT);
+  pinMode(greenLED, OUTPUT);
+
+  pinMode(buttonPin, INPUT);
+  pinMode(otherButtonPin, INPUT_PULLUP);
+  myServo.attach(servoPin);
+}
+
+void loop() {
+  buttonState = digitalRead(buttonPin);
+
+  if (buttonState == HIGH || digitalRead(otherButtonPin) == LOW) {
+    if (!raceStarted) {
+      countdown(); // Contagem regressiva
+      myServo.write(0); // Abre o servo exatamente quando a luz verde é ativada
+      delay(1000); // Aguarda 1 segundo após a largada
+      myServo.write(90); // Retorna o servo à posição inicial
+      raceStarted = true; // Sinaliza que a corrida iniciou
+    } else {
+      if (myServo.read() == 90) { // Verifica se o servo está na posição de fechamento
+        raceStarted = false; // Reseta a corrida
+        turnOffAllLEDs(); // Desliga todos os LEDs
+      }
+    }
+  }
+}
+
+void countdown() {
+  // Vermelho 1
+  digitalWrite(redLED1, HIGH);
+  delay(2000);
+  digitalWrite(redLED1, LOW);
+
+  // Vermelho 2
+  digitalWrite(redLED2, HIGH);
+  delay(2000);
+  digitalWrite(redLED2, LOW);
+
+  // Vermelho 3
+  digitalWrite(redLED3, HIGH);
+  delay(2000);
+  digitalWrite(redLED3, LOW);
+
+  // Amarelo 1
+  digitalWrite(yellowLED1, HIGH);
+  delay(2000);
+  digitalWrite(yellowLED1, LOW);
+
+  // Amarelo 2
+  digitalWrite(yellowLED2, HIGH);
+  delay(1000);
+  digitalWrite(yellowLED2, LOW);
+
+  // Verde - Largada
+  digitalWrite(greenLED, HIGH);
+  delay(1000); // Aguarda 1 segundo com o LED verde aceso
+  digitalWrite(greenLED, LOW); // Apaga o LED verde
+}
+
+void turnOffAllLEDs() {
+  digitalWrite(redLED1, LOW);
+  digitalWrite(redLED2, LOW);
+  digitalWrite(redLED3, LOW);
+  digitalWrite(yellowLED1, LOW);
+  digitalWrite(yellowLED2, LOW);
+  digitalWrite(greenLED, LOW);
+}
